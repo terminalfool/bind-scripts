@@ -13,14 +13,14 @@ my $adblock_stack = [
 		     { url => 'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=0&startdate[day]=&startdate[month]=&startdate[year]=&mimetype=plaintext',
 		              path => '/var/named/pgl-adblock.txt',
 		              refresh => 7,
-		            },
+		     },
 		     #adblockplus.org tracker list
 		     { url => "abp:subscribe?location=https%3A%2F%2Feasylist-downloads.adblockplus.org%2Feasyprivacy.txt&title=EasyPrivacy&requiresLocation=https%3A%2F%2Feasylist-downloads.adblockplus.org%2Feasylist.txt&requiresTitle=EasyList",
 		              path => '/var/named/easyprivacy.txt',
 		              refresh => 5,
-		            },
-		          # Add additional hashrefs if you like--script will accept standard or abp:subscribe? urls.
-		          # A collection of lists is available at http://adblockplus.org/en/subscriptions. 
+		     },
+		     # Add additional hashrefs if you like--script will accept standard or abp:subscribe? urls.
+		     # A collection of lists is available at http://adblockplus.org/en/subscriptions. 
 ];
 
 my %adfilter = ();
@@ -58,14 +58,14 @@ sub read_config {
 	          %cache = parse_single_col_hosts($blacklist->{path});     # local, custom hosts
                         %adfilter = %adfilter ? ( %adfilter, %cache ) 
 			  : %cache;
-		}
+	}
         if ($whitelist) {
 	          %cache = parse_single_col_hosts($whitelist->{path});     # remove entries
 		  for ( keys %cache ) { delete ( $adfilter{$_} ) };
-		}
+	}
 
 	#dump_adfilter;
-      };
+}
 
 sub load_adblock_filter {
   my %cache;
@@ -113,15 +113,14 @@ sub parse_single_col_hosts {
             open(HOSTS, $hostsfile) or die "cant open $hostsfile file: $!";
 
 	    while (<HOSTS>) {
-	                      chomp;
-			              next if /^\s*#/; # skip comments
-			              next if /^$/;    # skip empty lines
-			              s/\s*#.*$//;     # delete in-line comments and preceding whitespace
-			              $hosts{$_}++;
-			    }
-
-	            close(HOSTS);
-	  }
+	            chomp;
+		    next if /^\s*#/; # skip comments
+		    next if /^$/;    # skip empty lines
+		    s/\s*#.*$//;     # delete in-line comments and preceding whitespace
+		    $hosts{$_}++;
+	    }
+	    close(HOSTS);
+  }
   return %hosts;
 }
 
@@ -134,19 +133,20 @@ sub dump_adfilter {
 
 =head1 NAME
 
-bind_refresh.pl - 12.6.08 terminalfool@yahoo.com
+bind_refresh.pl
 
 =head1 DESCRIPTION
 
-The purpose of this script is to refresh and format domain lists into master zone 
-definitions for inclusion in a BIND config file. Intended for use under <I>launchd 
-(osx 10.5+) where bind is running as a persistent process..
+This is a maintenance script for use with I<BIND> acting as an ad blocking agent. 
+Its purpose is to refresh and format domain lists into master zone definitions for 
+inclusion in a bind config file. It was written for osx (10.5+), where bind is 
+running as a persistent process under I<launchd>.
 
 The script loads externally maintained lists of ad hosts intended for use by the 
-<I>adblock plus, Firefox extension. Use of the lists focuses only on third-party 
+I<adblock plus> Firefox extension. Use of the lists focuses only on third-party 
 listings that define dedicated ad/tracking hosts.
 
-A locally maintained  blacklist/whitelist can also be loaded. In this case, host 
+Locally maintained  blacklists/whitelists can also be loaded. In this case, host 
 listings must conform to a one host per line format:
 
     # ad nauseam
@@ -176,7 +176,11 @@ where null.zone.file is a localhost definition such as:
    @ IN A 127.0.0.1
    * IN A 127.0.0.1
 
-=head1 LICENSE
+=head1 AUTHOR
 
-Perl 5.0 License.
+David Watson <dwatson@cpan.org>
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
 =cut
