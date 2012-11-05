@@ -68,67 +68,69 @@ sub read_config {
 }
 
 sub load_adblock_filter {
-  my %cache;
+        my %cache;
 
-  my $hostsfile = $_->{path} or die "adblock {path} is undefined";
-  my $refresh = $_->{refresh} || 7;
-  my $age = -M $hostsfile || $refresh;
+	my $hostsfile = $_->{path} or die "adblock {path} is undefined";
+	my $refresh = $_->{refresh} || 7;
+	my $age = -M $hostsfile || $refresh;
 
-  if ($age >= $refresh) {
-    my $url = $_->{url} or die "attempting to refresh $hostsfile failed as {url} is undefined";
-            $url =~ s/^\s*abp:subscribe\?location=//;
+	if ($age >= $refresh) {
+	        my $url = $_->{url} or die "attempting to refresh $hostsfile failed as {url} is undefined";
+		$url =~ s/^\s*abp:subscribe\?location=//;
                 $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
                 $url =~ s/&.*$//;
-            print("refreshing hosts: $hostsfile\n");
-            getstore($url, $hostsfile);
-  }
+		print("refreshing hosts: $hostsfile\n");
+		getstore($url, $hostsfile);
+	}
 
-  %cache = parse_adblock_hosts($hostsfile);
-  
-  return %cache;
+	%cache = parse_adblock_hosts($hostsfile);
+
+	return %cache;
 }
 
 sub parse_adblock_hosts {
-  my $hostsfile = shift;
-  my %hosts;
+        my $hostsfile = shift;
+	my %hosts;
 
-  open(HOSTS, $hostsfile) or die "cant open $hostsfile file: $!";
+	open(HOSTS, $hostsfile) or die "cant open $hostsfile file: $!";
 
-  while (<HOSTS>) {
-            chomp;
+	while (<HOSTS>) {
+                chomp;
                 next unless s/^\|\|(.*)\^(\$third-party)?$/$1/;  #extract adblock host
-	    $hosts{$_}++;
-	  }
+	     $hosts{$_}++;
+	}
 
-  close(HOSTS);
+	close(HOSTS);
 
-  return %hosts;
+	return %hosts;
 }
 
 sub parse_single_col_hosts {
-  my $hostsfile = shift;
-  my %hosts;
+        my $hostsfile = shift;
+	my %hosts;
 
-  if (-e $hostsfile) {
-            open(HOSTS, $hostsfile) or die "cant open $hostsfile file: $!";
+	if (-e $hostsfile) {
+                open(HOSTS, $hostsfile) or die "cant open $hostsfile file: $!";
 
-	    while (<HOSTS>) {
-	            chomp;
-		    next if /^\s*#/; # skip comments
-		    next if /^$/;    # skip empty lines
-		    s/\s*#.*$//;     # delete in-line comments and preceding whitespace
-		    $hosts{$_}++;
-	    }
-	    close(HOSTS);
-  }
-  return %hosts;
+		while (<HOSTS>) {
+	                chomp;
+			next if /^\s*#/; # skip comments
+			next if /^$/;    # skip empty lines
+			s/\s*#.*$//;     # delete in-line comments and preceding whitespace
+			$hosts{$_}++;
+	        }
+
+		close(HOSTS);
+	}
+
+	return %hosts;
 }
 
 sub dump_adfilter {
-  my $str = Dumper(\%adfilter);
-  open(OUT, ">/var/named/adfilter_dumpfile") or die "cant open dump file: $!";
-  print OUT $str;
-  close OUT;
+        my $str = Dumper(\%adfilter);
+	open(OUT, ">/var/named/adfilter_dumpfile") or die "cant open dump file: $!";
+	print OUT $str;
+	close OUT;
 }
 
 =head1 NAME
