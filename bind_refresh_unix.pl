@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
+use Proc::Simple;
+use Proc::Killall;
 use Time::localtime;
 use LWP::Simple qw($ua getstore);
 $ua->agent("");
@@ -39,10 +41,8 @@ foreach my $key (sort(keys %adfilter)) {
 close OUT;
 
 print "BIND ad zones updated.\n";
-system('launchctl', 'stop', 'org.isc.named');
-print "named restarted.\n" unless $? == -1;
-# system('launchctl', 'stop', 'com.apple.dnsextd');
-# print "dnsextd restarted.\n" unless $? == -1;
+print "Halting BIND.\n" if killall('KILL','/usr/sbin/named');
+print "Restarting BIND.\n" if $proc->start('/usr/sbin/named -4');
 
 sub read_config {
         my %cache;
@@ -133,14 +133,14 @@ sub dump_adfilter {
 
 =head1 NAME
 
-bind_refresh.pl
+bind_refresh_unix.pl
 
 =head1 DESCRIPTION
 
 This is a maintenance script for use with I<BIND> acting as an ad blocking agent. 
 Its purpose is to refresh and format domain lists into master zone definitions for 
-inclusion in a bind config file. It was written for osx (10.5+), where bind is 
-running as a persistent process under I<launchd>.
+inclusion in a bind config file. It was written for osx (10.4), and manually kills 
+and restarts the I<named> process.
 
 The script loads externally maintained lists of ad hosts intended for use by the 
 I<adblock plus> Firefox extension. Use of the lists focuses only on third-party 
