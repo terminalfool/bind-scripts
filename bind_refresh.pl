@@ -139,7 +139,7 @@ bind_refresh.pl
 
 =head1 DESCRIPTION
 
-This is a maintenance script for use with I<BIND> acting as an ad blocking agent. 
+This is a maintenance script for use with I<BIND> acting as an ad blocking proxy. 
 Its purpose is to refresh and format domain lists into master zone definitions for 
 inclusion in a bind config file. It was written for osx (10.5+), where bind is 
 running as a persistent process under I<launchd>.
