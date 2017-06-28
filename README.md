@@ -1,4 +1,4 @@
-###DNS proxy maintenance scripts
+### DNS proxy maintenance scripts
 
 These are maintenance scripts for use with *bind* acting as an ad blocking proxy.
 Their purpose is to refresh and format domain lists into master zone definitions for
